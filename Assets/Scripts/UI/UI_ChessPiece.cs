@@ -2,8 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum EUIChessPieceMode
+{
+    Dragging,
+    Grid
+}
 public class UI_ChessPiece : MonoBehaviour
 {
+
+
     // Start is called before the first frame update
     void Start()
     {
