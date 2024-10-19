@@ -2,9 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IGameState
+namespace GameStates
 {
-    public void OnPhaseStarted();
+    public interface IGameState
+    {
+        public void OnPhaseStarted();
 
-    public void OnPhaseEnded();
+        public void OnPhaseEnded();
+    }
 }

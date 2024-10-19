@@ -3,71 +3,73 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UI_Board : MonoBehaviour
+namespace UI
 {
-    [SerializeField]
-    UI_Cell prefabCell;
-    [SerializeField]
-    RectTransform board;
-    [SerializeField]
-    Image boardImage;
-    [SerializeField]
-    BoardConfig boardConfig;
-
-    [SerializeField]
-    List<UI_Cell> cells;
-
-    private void Start()
+    public class UI_Board : MonoBehaviour, IGameService
     {
-        ResizeCells(false);
-    }
+        [SerializeField]
+        UI_Cell prefabCell;
+        [SerializeField]
+        RectTransform board;
+        [SerializeField]
+        Image boardImage;
+        [SerializeField]
+        BoardConfig boardConfig;
 
-    private void ResizeCells(bool isPooled)
-    {
-        if (!isPooled)
+        [SerializeField]
+        List<UI_Cell> cells;
+
+        private void Start()
         {
-            cells = new List<UI_Cell>();
+            ResizeCells(false);
+            ServiceLocator.AddService<UI_Board>(this);
         }
 
-        float widthBoard = board.rect.width;
-        float heightBoard = board.rect.height;
-
-        Debug.Log("Size : " + widthBoard + " , " + heightBoard);
-
-        float widthCell = widthBoard / boardConfig.GridSize.x;
-        float heightCell = heightBoard / boardConfig.GridSize.y;
-
-        float startCenterY = (heightCell - heightBoard) / 2;
-        float centerX = (widthCell - widthBoard) / 2;
-        float centerY = startCenterY;
-
-        UI_Cell cell;
-        for (int i = 0; i < boardConfig.GridSize.x; i++)
+        private void ResizeCells(bool isPooled)
         {
-            for (int j = 0; j < boardConfig.GridSize.y; j++)
+            if (!isPooled)
             {
-                if (isPooled)
-                {
-                    cell = cells[(i * boardConfig.GridSize.x) + j];
-                }
-                else
-                {
-                    cell = Instantiate<UI_Cell>(prefabCell, this.transform);
-                    cells.Add(cell);
-                }
-                
-                cell.SetSize(widthCell, heightCell, new Vector2(centerX, centerY));
-                centerY += heightCell;
+                cells = new List<UI_Cell>();
             }
-            centerX += widthCell;
-            centerY = startCenterY;
-        }
-    }
 
-    /*private void OnRectTransformDimensionsChange()
-    {
-        Debug.Log("Board Size Changed");
-        if(cells.Count > 0)
-            ResizeCells(true);
-    }*/
+            float widthBoard = board.rect.width;
+            float heightBoard = board.rect.height;
+
+            float widthCell = widthBoard / boardConfig.GridSize.x;
+            float heightCell = heightBoard / boardConfig.GridSize.y;
+
+            float startCenterY = (heightCell - heightBoard) / 2;
+            float centerX = (widthCell - widthBoard) / 2;
+            float centerY = startCenterY;
+
+            UI_Cell cell;
+            for (int i = 0; i < boardConfig.GridSize.x; i++)
+            {
+                for (int j = 0; j < boardConfig.GridSize.y; j++)
+                {
+                    if (isPooled)
+                    {
+                        cell = cells[(i * boardConfig.GridSize.x) + j];
+                    }
+                    else
+                    {
+                        cell = Instantiate<UI_Cell>(prefabCell, this.transform);
+                        cells.Add(cell);
+                    }
+
+                    cell.SetSize(widthCell, heightCell, new Vector2(centerX, centerY));
+                    centerY += heightCell;
+                }
+                centerX += widthCell;
+                centerY = startCenterY;
+            }
+        }
+
+        /*private void OnRectTransformDimensionsChange()
+        {
+            Debug.Log("Board Size Changed");
+            if(cells.Count > 0)
+                ResizeCells(true);
+        }*/
+    }
 }

@@ -2,15 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MainGameState : IGameState
+namespace GameStates
 {
-    public void OnPhaseEnded()
+    public class MainGameState : IGameState
     {
-        throw new System.NotImplementedException();
-    }
+        public void OnPhaseEnded()
+        {
+            throw new System.NotImplementedException();
+        }
 
-    public void OnPhaseStarted()
-    {
-        throw new System.NotImplementedException();
+        public void OnPhaseStarted()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

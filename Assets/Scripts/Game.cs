@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using GameStates;
 using UnityEngine;
 
 
@@ -16,10 +17,12 @@ public class Game
 {
     EGamePhase currentGamePhase;
     IGameState currentState;
+    ConfigPieces configPieces;
 
-    public Game()
+    public Game(ConfigPieces configPieces)
     {
         currentGamePhase = EGamePhase.None;
+        this.configPieces = configPieces;
         NextPhase();
     }
 
@@ -34,6 +37,7 @@ public class Game
                 currentState = new ChooseStartingPlayerState(NextPhase);
                 break;
             case EGamePhase.Deployment:
+                currentState = new DeploymentState(NextPhase, configPieces);
                 break;
             case EGamePhase.MainGame:
                 break;

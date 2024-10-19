@@ -2,22 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bishop : IChessPieceMovement
+namespace PieceMovement
 {
-    public Vector2Int[] GetPossibleMovements(BoardConfig boardConfig)
+    public class Bishop : IChessPieceMovement
     {
-        int maxAxis = Mathf.Max(boardConfig.GridSize.x, boardConfig.GridSize.y);
-
-        List<Vector2Int> movements = new List<Vector2Int>();
-
-        for (int x = 1; x < maxAxis; x++)
+        public Vector2Int[] GetPossibleMovements(BoardConfig boardConfig)
         {
-            movements.Add(new Vector2Int(x, x));
-            movements.Add(new Vector2Int(-x, x));
-            movements.Add(new Vector2Int(x, -x));
-            movements.Add(new Vector2Int(-x, -x));
-        }
+            int maxAxis = Mathf.Max(boardConfig.GridSize.x, boardConfig.GridSize.y);
 
-        return movements.ToArray();
+            List<Vector2Int> movements = new List<Vector2Int>();
+
+            for (int x = 1; x < maxAxis; x++)
+            {
+                movements.Add(new Vector2Int(x, x));
+                movements.Add(new Vector2Int(-x, x));
+                movements.Add(new Vector2Int(x, -x));
+                movements.Add(new Vector2Int(-x, -x));
+            }
+
+            return movements.ToArray();
+        }
     }
 }

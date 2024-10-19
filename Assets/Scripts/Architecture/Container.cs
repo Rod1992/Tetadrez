@@ -20,6 +20,14 @@ public class Container<T>
         }
     }
 
+    public static T GetItem(int index)
+    {
+        if (index < Count && index > 0)
+            return Instance.items[index];
+        else
+            return default(T);
+    }
+
     public static int Count
     {
         get => Instance.items.Count;
@@ -45,9 +53,14 @@ public class Container<T>
         items.Clear();
     }
 
-    private void InternalFindItem(Predicate<T> predicate)
+    private T InternalFindItem(Predicate<T> predicate)
     {
-        items.Find(predicate);
+        return items.Find(predicate);
+    }
+
+    private void InternalReverse()
+    {
+        items.Reverse();
     }
 
     public static void AddItem(T newItem)
@@ -65,10 +78,18 @@ public class Container<T>
         Instance.InternalClear();
     }
 
-    public static void FindItem(Predicate<T> predicate)
+    public static T FindItem(Predicate<T> predicate)
     {
-        Instance.InternalFindItem(predicate);
+        return Instance.InternalFindItem(predicate);
     }
 
-    
+    public static void Reverse()
+    {
+        Instance.InternalReverse();
+    }
+
+    public static T[] GetItems()
+    {
+        return Instance.items.ToArray();
+    }
 }

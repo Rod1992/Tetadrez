@@ -2,13 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Knight : IChessPieceMovement
+namespace PieceMovement
 {
-    /// <summary>
-    /// Possible Knight movements are static and we can avoid calculating them
-    /// or allocating them each time we try to get the knight movement
-    /// </summary>
-    static readonly Vector2Int[] movements = new Vector2Int[] {
+    public class Knight : IChessPieceMovement
+    {
+        /// <summary>
+        /// Possible Knight movements are static and we can avoid calculating them
+        /// or allocating them each time we try to get the knight movement
+        /// </summary>
+        static readonly Vector2Int[] movements = new Vector2Int[] {
             new Vector2Int(2, 1),
             new Vector2Int(-2, 1),
             new Vector2Int(2, -1),
@@ -19,8 +21,9 @@ public class Knight : IChessPieceMovement
             new Vector2Int(-1, -2)
     };
 
-    public Vector2Int[] GetPossibleMovements(BoardConfig boardConfig)
-    {
-        return movements;
+        public Vector2Int[] GetPossibleMovements(BoardConfig boardConfig)
+        {
+            return movements;
+        }
     }
 }
