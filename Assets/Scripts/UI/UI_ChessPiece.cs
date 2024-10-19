@@ -27,6 +27,7 @@ namespace UI
 
             public static void StartDragging(UI_ChessPiece chessPiece)
             {
+                EndDragging();
                 currentHandler = new HandlerDraggingChessPiece(chessPiece);
             }
 
