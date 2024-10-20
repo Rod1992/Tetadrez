@@ -9,6 +9,7 @@ namespace GameStates
     public class DeploymentState : IGameState
     {
         Action OnEndState;
+
         ConfigPieces configPieces;
 
         public DeploymentState(Action OnEndState, ConfigPieces configPieces)
@@ -19,12 +20,13 @@ namespace GameStates
 
         public void OnPhaseEnded()
         {
-           
+            TurnSystem.OnPassTurn -= OnPassTurn;
         }
 
         public void OnPhaseStarted()
         {
             SpawnPieces();
+            UI_ChessPiece.currentMode = EUIChessPieceMode.Dragging;
             StartTurnSystem();
         }
 
@@ -53,7 +55,7 @@ namespace GameStates
 
         private void StartTurnSystem()
         {
-            UI_ChessPiece.currentMode = EUIChessPieceMode.Dragging;
+            BoardState boardState = new BoardState();
             TurnSystem.OnPassTurn += OnPassTurn;
             TurnSystem turnSystem = new TurnSystem();
         }
@@ -63,6 +65,14 @@ namespace GameStates
             foreach (ChessPiece chessPiece in Container<ChessPiece>.GetItems())
             {
                 chessPiece.ViewChessPiece.SetActive(chessPiece.Player == player);
+            }
+
+            ChessPiece draggableItem = Container<ChessPiece>.FindItem((x) => x.ViewChessPiece.CanBeDragged);
+
+            //If we can't find a draggable Item, it means that we have ended the Deployment State
+            if (draggableItem == null)
+            {
+                OnEndState?.Invoke();
             }
         }
     }

@@ -31,6 +31,8 @@ namespace UI
             rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
         }
 
+
+
         public void Select()
         {
             Debug.Log("SelectedCell");

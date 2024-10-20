@@ -26,17 +26,29 @@ public class Game
         NextPhase();
     }
 
+    public void ForcePhase(EGamePhase gamePhase)
+    {
+        OnPhaseEnded();
+        currentGamePhase = gamePhase;
+        SetPhase();
+    }
+
     public void NextPhase()
     {
         OnPhaseEnded();
         currentGamePhase++;
+        SetPhase();
+    }
 
+    private void SetPhase()
+    {
         switch (currentGamePhase)
         {
             case EGamePhase.ChooseStartingPlayer:
                 currentState = new ChooseStartingPlayerState(NextPhase);
                 break;
             case EGamePhase.Deployment:
+                BoardState.OnGameOver += OnGameOver;
                 currentState = new DeploymentState(NextPhase, configPieces);
                 break;
             case EGamePhase.MainGame:
@@ -51,5 +63,11 @@ public class Game
     public void OnPhaseEnded()
     {
         currentState?.OnPhaseEnded();
+    }
+
+    public void OnGameOver(Player player)
+    {
+        Debug.Log("Game Over");
+        ForcePhase(EGamePhase.GameOver);
     }
 }

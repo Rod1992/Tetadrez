@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,6 +8,8 @@ namespace UI
 {
     public class UI_Board : MonoBehaviour, IGameService
     {
+        public static Action OnBoardChanged;
+
         [SerializeField]
         UI_Cell prefabCell;
         [SerializeField]
@@ -17,7 +20,7 @@ namespace UI
         BoardConfig boardConfig;
 
         [SerializeField]
-        List<UI_Cell> cells;
+        UI_Cell[,] cells;
 
         private void Start()
         {
@@ -29,7 +32,7 @@ namespace UI
         {
             if (!isPooled)
             {
-                cells = new List<UI_Cell>();
+                cells = new UI_Cell[boardConfig.GridSize.x, boardConfig.GridSize.y];
             }
 
             float widthBoard = board.rect.width;
@@ -47,17 +50,13 @@ namespace UI
             {
                 for (int j = 0; j < boardConfig.GridSize.y; j++)
                 {
-                    if (isPooled)
-                    {
-                        cell = cells[(i * boardConfig.GridSize.x) + j];
-                    }
-                    else
+                    if (!isPooled)
                     {
                         cell = Instantiate<UI_Cell>(prefabCell, this.transform);
-                        cells.Add(cell);
+                        cells[i, j] = cell;
                     }
 
-                    cell.SetSize(widthCell, heightCell, new Vector2(centerX, centerY));
+                    cells[i, j].SetSize(widthCell, heightCell, new Vector2(centerX, centerY));
                     centerY += heightCell;
                 }
                 centerX += widthCell;

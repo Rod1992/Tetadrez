@@ -50,7 +50,7 @@ namespace UI
         bool isActive = false;
         bool isDocked = false;
 
-        bool CanBeDragged
+        public bool CanBeDragged
         {
             get => isActive && !isDocked;
         }
