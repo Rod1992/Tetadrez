@@ -20,6 +20,7 @@ namespace GameStates
 
         public void OnPhaseEnded()
         {
+            Debug.Log("Ended Deployment");
             TurnSystem.OnPassTurn -= OnPassTurn;
         }
 
