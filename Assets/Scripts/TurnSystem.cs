@@ -29,7 +29,7 @@ public class TurnSystem : IGameService
 
     public void PassTurn()
     {
-        if(Container<Player>.Count <= indexActivePlayer++)
+        if(Container<Player>.Count <= ++indexActivePlayer)
         {
             indexActivePlayer = 0;
         }
