@@ -9,6 +9,9 @@ namespace UI
         [SerializeField]
         private int playerIndex;
 
+        [SerializeField]
+        private List<GameObject> spawners;
+
         public int PlayerIndex { get => playerIndex;}
 
         void Awake()
@@ -26,6 +29,16 @@ namespace UI
         void Update()
         {
 
+        }
+
+        public void SetPieceToPosition(UI_ChessPiece piece, int index)
+        {
+            piece.transform.SetParent(this.transform);
+
+            if(spawners.Count > index && index > -1)
+            {
+                piece.transform.position = spawners[index].transform.position;
+            }
         }
     }
 }

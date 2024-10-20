@@ -39,6 +39,12 @@ namespace UI
                 Debug.Log("Added ChessPiece to Cell");
                 chessPiece.transform.position = this.transform.position;
                 UI_ChessPiece.HandlerDraggingChessPiece.EndDragging();
+                chessPiece.SetDocked(true);
+
+                if(ServiceLocator.GetGameService<TurnSystem>(out TurnSystem turnSystem))
+                {
+                    turnSystem.PassTurn();
+                }
             }
         }
     }

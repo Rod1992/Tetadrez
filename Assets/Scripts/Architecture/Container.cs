@@ -22,7 +22,7 @@ public class Container<T>
 
     public static T GetItem(int index)
     {
-        if (index < Count && index > 0)
+        if (index < Count && index > -1)
             return Instance.items[index];
         else
             return default(T);

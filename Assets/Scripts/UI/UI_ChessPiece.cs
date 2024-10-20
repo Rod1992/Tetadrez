@@ -44,9 +44,17 @@ namespace UI
             }
         }
 
-        public static EUIChessPieceMode currentMode = EUIChessPieceMode.Dragging;
+        public static EUIChessPieceMode currentMode = EUIChessPieceMode.None;
 
         bool isDragging = false;
+        bool isActive = false;
+        bool isDocked = false;
+
+        bool CanBeDragged
+        {
+            get => isActive && !isDocked;
+        }
+
         Coroutine draggingCoroutine;
 
         [SerializeField]
@@ -62,7 +70,7 @@ namespace UI
 
         public void Select()
         {
-            if(UI_ChessPiece.currentMode == EUIChessPieceMode.Dragging)
+            if(UI_ChessPiece.currentMode == EUIChessPieceMode.Dragging && CanBeDragged)
             {
                 if (!isDragging)
                 {
@@ -88,7 +96,7 @@ namespace UI
         {
             isDragging = false;
             HandlerDraggingChessPiece.currentHandler = null;
-
+            
             if (draggingCoroutine != null)
                 StopCoroutine(draggingCoroutine);
             Debug.Log("EndDragging");
@@ -106,6 +114,16 @@ namespace UI
             }
 
             EndDragging();
+        }
+
+        public void SetActive(bool active)
+        {
+            isActive = active;
+        }
+
+        public void SetDocked(bool docked)
+        {
+            isDocked = docked;
         }
     }
 }

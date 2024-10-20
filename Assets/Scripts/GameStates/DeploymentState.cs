@@ -24,21 +24,45 @@ namespace GameStates
 
         public void OnPhaseStarted()
         {
+            SpawnPieces();
+            StartTurnSystem();
+        }
+
+        private void SpawnPieces()
+        {
             if (ServiceLocator.GetGameService<UI_Board>(out UI_Board ui_Board))
             {
-                UI_ChessPiece piece;
+                ChessPiece piece;
 
                 foreach (Player player in Container<Player>.GetItems())
                 {
                     Color color = player.Color;
-                    UI_PlayerPanel panel = Container<UI_PlayerPanel>.FindItem((panel) => panel.PlayerIndex == player.Id); 
+                    UI_PlayerPanel panel = Container<UI_PlayerPanel>.FindItem((panel) => panel.PlayerIndex == player.Id);
 
-                    foreach (ChessPieceObject pieceObject in configPieces.ChessPieces)
+                    int index = 0;
+                    foreach (ChessPieceScriptable pieceObject in configPieces.ChessPieces)
                     {
-                        piece = pieceObject.CreateObject(panel.transform, color);
-                        Container<UI_ChessPiece>.AddItem(piece);
+                        piece = pieceObject.CreateObject(panel.transform, player);
+                        panel.SetPieceToPosition(piece.ViewChessPiece, index);
+                        Container<ChessPiece>.AddItem(piece);
+                        index++;
                     }
                 }
+            }
+        }
+
+        private void StartTurnSystem()
+        {
+            UI_ChessPiece.currentMode = EUIChessPieceMode.Dragging;
+            TurnSystem.OnPassTurn += OnPassTurn;
+            TurnSystem turnSystem = new TurnSystem();
+        }
+
+        private void OnPassTurn(int indexPlayer, Player player)
+        {
+            foreach (ChessPiece chessPiece in Container<ChessPiece>.GetItems())
+            {
+                chessPiece.ViewChessPiece.SetActive(chessPiece.Player == player);
             }
         }
     }

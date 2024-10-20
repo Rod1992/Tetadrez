@@ -6,9 +6,9 @@ using UnityEngine;
 public class ConfigPieces : ScriptableObject
 {
     [SerializeField]
-    List<ChessPieceObject> chessPieces;
+    List<ChessPieceScriptable> chessPieces;
 
-    public List<ChessPieceObject> ChessPieces
+    public List<ChessPieceScriptable> ChessPieces
     {
         get => chessPieces;
     }

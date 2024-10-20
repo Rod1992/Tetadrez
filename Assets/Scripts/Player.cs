@@ -12,4 +12,6 @@ public class Player
         this.Color = color;
         this.Id = id;
     }
+
+
 }
