@@ -92,4 +92,9 @@ public class Container<T>
     {
         return Instance.items.ToArray();
     }
+
+    public static T[] Filter(Predicate<T> match)
+    {
+        return Instance.items.FindAll(match).ToArray();
+    }
 }

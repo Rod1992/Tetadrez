@@ -63,10 +63,19 @@ namespace UI
             bool hasSelection = UI_ChessPiece.HandlerSelectGrid.TryGetSelection(out selected, out CellModel other);
             if (Model.chessPiece == null && hasSelection)
             {
-                OnSwap?.Invoke(other);
-                Model.chessPiece.ViewChessPiece.transform.position = this.transform.position;
-                UI_ChessPiece.HandlerSelectGrid.EndSelection();
-
+                if(ServiceLocator.GetGameService<BoardState>(out BoardState boardState))
+                {
+                    if (boardState.CanMoveFromTo(other, Model))
+                    {
+                        OnSwap?.Invoke(other);
+                        Model.chessPiece.ViewChessPiece.transform.position = this.transform.position;
+                        UI_ChessPiece.HandlerSelectGrid.EndSelection();
+                    }
+                    else
+                    {
+                        Debug.LogWarning("TriedIllegalMove");
+                    }
+                }
             }
             else if (Model.chessPiece != null && !hasSelection)
             {

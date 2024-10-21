@@ -96,14 +96,14 @@ public class BoardState : IGameService
     }
 
 
-    public bool CanMoveFromTo(Cell from, Cell to)
+    public bool CanMoveFromTo(CellModel from, CellModel to)
     {
-        ChessPiece chessPiece = from.Model.chessPiece;
+        ChessPiece chessPiece = from.chessPiece;
         //no chess piece
         if (chessPiece == null)
             return false;
         //Cell already occupied
-        if (to.Model.chessPiece != null)
+        if (to.chessPiece != null)
             return false;
 
         if (ServiceLocator.GetGameService<UI_Board>(out UI_Board board))
@@ -118,25 +118,45 @@ public class BoardState : IGameService
 
                 if (movement.Collision)
                 {
+                    bool collided = false;
                     foreach (Vector2Int vector in movement.Path)
                     {
-                        Vector2Int pos = movement.Destination + vector;
+                        Vector2Int pos = from.Pos + vector;
 
                         if(pos.x > -1 && pos.y > -1 && pos.x < board.BoardConfig.GridSize.x && pos.y < board.BoardConfig.GridSize.y)
                         {
                             if (cells[pos.x, pos.y].Model.Player != null)
                             {
+                                collided = true;
                                 break;
                             }
                         }
                         
                     }
-                    return true;
+                    if(!collided)
+                        return true;
                 }
                 else
                 {
                     return true;
                 }
+            }
+        }
+
+        return false;
+    }
+
+    public bool CanPlayerMove(Player player)
+    {
+        foreach (Cell from in cells)
+        {
+            if (from.Model.Player != player)
+                continue;
+
+            foreach (Cell to in cells)
+            {
+                if (CanMoveFromTo(from.Model, to.Model))
+                    return true;
             }
         }
 

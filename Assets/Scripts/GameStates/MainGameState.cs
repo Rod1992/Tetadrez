@@ -31,19 +31,23 @@ namespace GameStates
                 chessPiece.ViewChessPiece.SetGridMode();
             }
 
-            if (ServiceLocator.GetGameService<BoardState>(out BoardState board) && ServiceLocator.GetGameService<TurnSystem>(out TurnSystem turnSystem))
-            {
-                board.SetActiveCells(turnSystem.ActivePlayer);
-            }
+            if(ServiceLocator.GetGameService<TurnSystem>(out TurnSystem turnSystem))
+                OnPassTurn(0, turnSystem.ActivePlayer);
         }
 
         private void OnPassTurn(int indexPlayer, Player player)
         {
             if(ServiceLocator.GetGameService<BoardState>(out BoardState boardState))
             {
-                boardState.SetActiveCells(player);
+                if (!boardState.CanPlayerMove(player) && ServiceLocator.GetGameService<TurnSystem>(out TurnSystem turnSystem))
+                {
+                    turnSystem.PassTurn();
+                }
+                else
+                {
+                    boardState.SetActiveCells(player);
+                }
             }
-            
         }
     }
 }

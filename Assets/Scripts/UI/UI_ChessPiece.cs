@@ -71,10 +71,7 @@ namespace UI
             }
 
             public static void EndSelection()
-            {
-                if(currentHandler != null && currentHandler.selectedCell != null)
-                     currentHandler.selectedCell.chessPiece = null;
-
+            {        
                 currentHandler = null;
             }
         }
