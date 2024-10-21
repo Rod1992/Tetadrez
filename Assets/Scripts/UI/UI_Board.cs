@@ -22,6 +22,13 @@ namespace UI
         [SerializeField]
         UI_Cell[,] cells;
 
+        public UI_Cell[,] Cells => cells;
+
+        public BoardConfig BoardConfig
+        {
+            get => boardConfig;
+        }
+
         private void Start()
         {
             ResizeCells(false);
