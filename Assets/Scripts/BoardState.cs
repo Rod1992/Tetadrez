@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UI;
+using PieceMovement;
 
 public class BoardState : IGameService
 {
@@ -17,6 +18,7 @@ public class BoardState : IGameService
     {
         //UI_Board.OnBoardChanged += OnBoardChanged;
         SetBoardState();
+        ServiceLocator.AddService<CellModels>(new CellModels());
         ServiceLocator.AddService<BoardState>(this);
     }
 
@@ -34,7 +36,7 @@ public class BoardState : IGameService
                 {
                     cells[i, j] = new Cell(new Vector2Int(i, j), board.Cells[i,j]);
 
-                    board.Cells[i, j].SetOwner += OnBoardChanged;
+                    cells[i, j].SetOwner += OnBoardChanged;
 
                     if (i - 1 > - 1)
                         Cell.SetLeftRight(cells[i - 1, j], cells[i, j]);
@@ -46,9 +48,12 @@ public class BoardState : IGameService
         }
     }
 
-    private void OnBoardChanged(Vector2Int pos, Player player)
+    private void OnBoardChanged(Vector2Int pos, Cell cell)
     {
-        Debug.Log("Check Board State");
+        Player player = cell.Model.Player;
+
+        if (player == null)
+            return;
 
         for (int i = -1; i <= 1; i++)
         {
@@ -60,7 +65,7 @@ public class BoardState : IGameService
                 Cell cell1 = null;
                 if (cells[pos.x, pos.y].TryGetCellFromMovement(new Vector2Int(i, j), ref cell1))
                 {
-                    if (player != cell1.Player)
+                    if (player != cell1.Model.Player)
                     {
                         continue;
                     }
@@ -70,7 +75,7 @@ public class BoardState : IGameService
                     if (cells[pos.x, pos.y].TryGetCellFromMovement(new Vector2Int(i * 2, j * 2), ref cell2) ||
                         cells[pos.x, pos.y].TryGetCellFromMovement(new Vector2Int(i * -1, j * -1), ref cellOpp))
                     {
-                        if (player == cell2?.Player || player == cellOpp?.Player)
+                        if (player == cell2?.Model.Player || player == cellOpp?.Model.Player)
                         {
                             //Tic Tac Toe Achieved
                             OnGameOver?.Invoke(player);
@@ -78,10 +83,63 @@ public class BoardState : IGameService
                         }
                     }
                 }
-                
             }
         }
-       
     }
 
+    public void SetActiveCells(Player player)
+    {
+        foreach (Cell cell in cells)
+        {
+            cell.Active = player == cell.Model.Player || cell.Model.Player == null;
+        }
+    }
+
+
+    public bool CanMoveFromTo(Cell from, Cell to)
+    {
+        ChessPiece chessPiece = from.Model.chessPiece;
+        //no chess piece
+        if (chessPiece == null)
+            return false;
+        //Cell already occupied
+        if (to.Model.chessPiece != null)
+            return false;
+
+        if (ServiceLocator.GetGameService<UI_Board>(out UI_Board board))
+        {
+            BoardConfig config = board.BoardConfig;
+            Movement[] movements = chessPiece.Movement.GetPossibleMovements(board.BoardConfig);
+
+            foreach (Movement movement in movements)
+            {
+                if (movement.Destination + from.Pos != to.Pos)
+                    continue;
+
+                if (movement.Collision)
+                {
+                    foreach (Vector2Int vector in movement.Path)
+                    {
+                        Vector2Int pos = movement.Destination + vector;
+
+                        if(pos.x > -1 && pos.y > -1 && pos.x < board.BoardConfig.GridSize.x && pos.y < board.BoardConfig.GridSize.y)
+                        {
+                            if (cells[pos.x, pos.y].Model.Player != null)
+                            {
+                                break;
+                            }
+                        }
+                        
+                    }
+                    return true;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }

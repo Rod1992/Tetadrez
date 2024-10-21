@@ -12,7 +12,7 @@ public class TurnSystem : IGameService
 
     int indexActivePlayer;
 
-    Player ActivePlayer
+    public Player ActivePlayer
     {
         get
         {

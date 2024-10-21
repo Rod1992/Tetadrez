@@ -14,13 +14,13 @@ namespace UI
 
     public class UI_ChessPiece : MonoBehaviour
     {
-        public class HandlerDraggingChessPiece
+        public class HandlerDragging
         {
-            public static HandlerDraggingChessPiece currentHandler;
+            public static HandlerDragging currentHandler;
 
             ChessPiece piece;
 
-            private HandlerDraggingChessPiece(ChessPiece chessPiece)
+            private HandlerDragging(ChessPiece chessPiece)
             {
                 piece = chessPiece;
             }
@@ -28,7 +28,7 @@ namespace UI
             public static void StartDragging(ChessPiece chessPiece)
             {
                 EndDragging();
-                currentHandler = new HandlerDraggingChessPiece(chessPiece);
+                currentHandler = new HandlerDragging(chessPiece);
             }
 
             public static bool TryGetSelection(out ChessPiece chessPiece)
@@ -40,6 +40,41 @@ namespace UI
             public static void EndDragging()
             {
                 currentHandler?.piece.ViewChessPiece.EndDragging();
+                currentHandler = null;
+            }
+        }
+
+        public class HandlerSelectGrid
+        {
+            public static HandlerSelectGrid currentHandler;
+
+            ChessPiece piece;
+            CellModel selectedCell;
+
+            private HandlerSelectGrid(ChessPiece chessPiece, CellModel selected)
+            {
+                piece = chessPiece;
+                selectedCell = selected;
+            }
+
+            public static void StartSelection(ChessPiece chessPiece, CellModel selected)
+            {
+                EndSelection();
+                currentHandler = new HandlerSelectGrid(chessPiece, selected);
+            }
+
+            public static bool TryGetSelection(out ChessPiece chessPiece, out CellModel cell)
+            {
+                chessPiece = currentHandler?.piece;
+                cell = currentHandler?.selectedCell;
+                return currentHandler != null && currentHandler.piece != null;
+            }
+
+            public static void EndSelection()
+            {
+                if(currentHandler != null && currentHandler.selectedCell != null)
+                     currentHandler.selectedCell.chessPiece = null;
+
                 currentHandler = null;
             }
         }
@@ -87,7 +122,6 @@ namespace UI
         private void StartDragging()
         {
             isDragging = true;
-            Debug.Log("Selected");
             OnStartDragging?.Invoke();
             button.raycastTarget = false;
             draggingCoroutine = StartCoroutine(OnDrag());
@@ -96,16 +130,14 @@ namespace UI
         private void EndDragging()
         {
             isDragging = false;
-            HandlerDraggingChessPiece.currentHandler = null;
-            
+            HandlerDragging.currentHandler = null;
+            button.raycastTarget = true;
             if (draggingCoroutine != null)
                 StopCoroutine(draggingCoroutine);
-            Debug.Log("EndDragging");
         }
 
         private IEnumerator OnDrag()
         {
-            Debug.Log("Dragging");
             int i = 0;
             while (i < int.MaxValue)
             {
@@ -122,9 +154,21 @@ namespace UI
             isActive = active;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="docked">true if docked to a cell</param>
         public void SetDocked(bool docked)
         {
             isDocked = docked;
+            button.raycastTarget = !docked;
+        }
+
+        public void SetGridMode()
+        {
+            isDragging = false;
+            SetDocked(true);
+            SetActive(false);
         }
     }
 }

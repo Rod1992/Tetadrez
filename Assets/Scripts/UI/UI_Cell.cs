@@ -10,26 +10,24 @@ namespace UI
         /// <summary>
         /// returns pos of cell
         /// </summary>
-        public Action<Vector2Int, Player> SetOwner;
+        public Action<ChessPiece> SetOwner;
+        public Action<CellModel> OnSwap;
+        public Action OnStartSelection;
 
         public Vector2Int Pos { get; private set; }
 
+        CellModel Model
+        {
+            get
+            {
+                ServiceLocator.GetGameService<CellModels>(out CellModels models);
+
+                return models.Get(Pos);
+            }
+        }
+
         [SerializeField]
         RectTransform rectTransform;
-
-        ChessPiece chessPiece;
-
-        // Start is called before the first frame update
-        void Start()
-        {
-
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
 
         public void SetSize(float width, float height, Vector2 pos, Vector2Int gridPos)
         {
@@ -41,19 +39,43 @@ namespace UI
 
         public void Select()
         {
-            Debug.Log("SelectedCell");
-            if (chessPiece == null && UI_ChessPiece.HandlerDraggingChessPiece.TryGetSelection(out chessPiece))
+            if (UI_ChessPiece.currentMode == EUIChessPieceMode.Dragging && Model.chessPiece == null && UI_ChessPiece.HandlerDragging.TryGetSelection(out ChessPiece newChessPiece))
             {
-                Debug.Log("Added ChessPiece to Cell");
-                chessPiece.ViewChessPiece.transform.position = this.transform.position;
-                UI_ChessPiece.HandlerDraggingChessPiece.EndDragging();
-                chessPiece.ViewChessPiece.SetDocked(true);
-                SetOwner?.Invoke(Pos, chessPiece.Player);
+                OnDraggingSelection(newChessPiece);
+            }
+            else if (UI_ChessPiece.currentMode == EUIChessPieceMode.Grid)
+            {
+                OnGridSelection();
+            }
+        }
 
-                if(ServiceLocator.GetGameService<TurnSystem>(out TurnSystem turnSystem))
-                {
-                    turnSystem.PassTurn();
-                }
+        private void OnDraggingSelection(ChessPiece newChessPiece)
+        {
+            SetOwner?.Invoke(newChessPiece);
+            Model.chessPiece.ViewChessPiece.transform.position = this.transform.position;
+            UI_ChessPiece.HandlerDragging.EndDragging();
+            Model.chessPiece.ViewChessPiece.SetDocked(true);
+        }
+
+        private void OnGridSelection()
+        {
+            ChessPiece selected;
+            bool hasSelection = UI_ChessPiece.HandlerSelectGrid.TryGetSelection(out selected, out CellModel other);
+            if (Model.chessPiece == null && hasSelection)
+            {
+                OnSwap?.Invoke(other);
+                Model.chessPiece.ViewChessPiece.transform.position = this.transform.position;
+                UI_ChessPiece.HandlerSelectGrid.EndSelection();
+
+            }
+            else if (Model.chessPiece != null && !hasSelection)
+            {
+                OnStartSelection?.Invoke();
+                UI_ChessPiece.HandlerSelectGrid.StartSelection(Model.chessPiece, Model);
+            }
+            else if (Model.chessPiece == selected)
+            {
+                UI_ChessPiece.HandlerSelectGrid.EndSelection();
             }
         }
     }

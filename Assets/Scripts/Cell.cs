@@ -2,10 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UI;
+using System;
 
 public class Cell
 {
+    /// <summary>
+    /// returns pos of cell
+    /// </summary>
+    public Action<Vector2Int, Cell> SetOwner;
+
     UI_Cell ui_Cell;
+
+    public bool Active
+    {
+        get
+        {
+            return ui_Cell.gameObject.activeSelf;
+        }
+        set
+        {
+            ui_Cell.gameObject.SetActive(value);
+        }
+    }
 
     public Vector2Int Pos { get; private set; }
 
@@ -31,12 +49,6 @@ public class Cell
         get => ui_Cell;
     }
 
-    public Player Player
-    {
-        get;
-        set;
-    }
-
     public static void SetLeftRight(Cell left, Cell right)
     {
         if (left == null || right == null)
@@ -59,7 +71,18 @@ public class Cell
     {
         this.Pos = pos;
         this.ui_Cell = ui_Cell;
-        ui_Cell.SetOwner += SetOwner;
+        ui_Cell.SetOwner += this.OnSetOwner;
+        ui_Cell.OnSwap += this.OnSwapPieces;
+    }
+
+    public CellModel Model
+    {
+        get
+        {
+            ServiceLocator.GetGameService<CellModels>(out CellModels models);
+
+            return models.Get(Pos);
+        }
     }
 
     /// <summary>
@@ -76,7 +99,7 @@ public class Cell
         {
             cell = movement.x > 0 ? Right : Left;
             consumedmovement = new Vector2Int(movement.x > 0 ? movement.x - 1 : movement.x + 1, movement.y);
-        } else if(movement.y != 0)
+        } else if (movement.y != 0)
         {
             cell = movement.y > 0 ? Up : Down;
             consumedmovement = new Vector2Int(movement.x, movement.y > 0 ? movement.y - 1 : movement.y + 1);
@@ -90,8 +113,8 @@ public class Cell
         {
             return true;
         }
-        else{
-            
+        else {
+
             return cell.TryGetCellFromMovement(consumedmovement, ref cell);
         }
     }
@@ -101,10 +124,10 @@ public class Cell
         List<Cell> cells = new List<Cell>();
 
         Cell cell = null;
-        for(int i = 0; i < movements.Length; i++)
+        for (int i = 0; i < movements.Length; i++)
         {
             Vector2Int movement = movements[i];
-            if(TryGetCellFromMovement(movement, ref cell))
+            if (TryGetCellFromMovement(movement, ref cell))
             {
                 cells.Add(cell);
             }
@@ -113,8 +136,44 @@ public class Cell
         return cells;
     }
 
-    public void SetOwner(Vector2Int pos, Player player)
+    public void SetPiece(ChessPiece chessPiece, bool notify = true)
     {
-        Player = player;
+        Model.chessPiece = chessPiece;
+
+        if (notify)
+        {
+            SetOwner?.Invoke(Pos, this);
+        }
+    }
+
+    public void OnSwapPieces(CellModel other)
+    {
+        SwapPieces(other);
+
+        PassTurn();
+    }
+
+    void OnSetOwner(ChessPiece chessPiece)
+    {
+        Model.chessPiece = chessPiece;
+        PassTurn();
+    }
+
+    private static void PassTurn()
+    {
+        if (ServiceLocator.GetGameService<TurnSystem>(out TurnSystem turnSystem))
+        {
+            turnSystem.PassTurn();
+        }
+    }
+    
+    public void SwapPieces(CellModel other)
+    {
+        ChessPiece aux = this.Model.chessPiece;
+
+        this.SetPiece(other.chessPiece, false);
+        other.chessPiece = aux;
+
+        this.SetOwner?.Invoke(this.Pos, this);
     }
 }

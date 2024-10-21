@@ -67,6 +67,6 @@ public class ChessPieceScriptable : ScriptableObject
 
     void StartDragging(ChessPiece chessPiece)
     {
-        UI_ChessPiece.HandlerDraggingChessPiece.StartDragging(chessPiece);
+        UI_ChessPiece.HandlerDragging.StartDragging(chessPiece);
     }
 }

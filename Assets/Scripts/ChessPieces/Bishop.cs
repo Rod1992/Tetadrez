@@ -6,21 +6,23 @@ namespace PieceMovement
 {
     public class Bishop : IChessPieceMovement
     {
-        public Vector2Int[] GetPossibleMovements(BoardConfig boardConfig)
+        static List<Movement> movements;
+
+        public Movement[] GetPossibleMovements(BoardConfig boardConfig)
         {
-            int maxAxis = Mathf.Max(boardConfig.GridSize.x, boardConfig.GridSize.y);
-
-            List<Vector2Int> movements = new List<Vector2Int>();
-
-            for (int x = 1; x < maxAxis; x++)
+            if(movements == null)
             {
-                movements.Add(new Vector2Int(x, x));
-                movements.Add(new Vector2Int(-x, x));
-                movements.Add(new Vector2Int(x, -x));
-                movements.Add(new Vector2Int(-x, -x));
+                movements = new List<Movement>();
+
+                ChessPieceMovementFunctions.AddPaths(boardConfig, new Vector2Int(1, 1), new List<Vector2Int>(), movements);
+                ChessPieceMovementFunctions.AddPaths(boardConfig, new Vector2Int(-1, 1), new List<Vector2Int>(), movements);
+                ChessPieceMovementFunctions.AddPaths(boardConfig, new Vector2Int(1, -1), new List<Vector2Int>(), movements);
+                ChessPieceMovementFunctions.AddPaths(boardConfig, new Vector2Int(-1, -1), new List<Vector2Int>(), movements);
             }
 
             return movements.ToArray();
         }
+
+        
     }
 }

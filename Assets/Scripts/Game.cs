@@ -52,7 +52,8 @@ public class Game
                 currentState = new DeploymentState(NextPhase, configPieces);
                 break;
             case EGamePhase.MainGame:
-                return;
+                currentState = new MainGameState(NextPhase);
+                break;
             case EGamePhase.GameOver:
                 return;
         }

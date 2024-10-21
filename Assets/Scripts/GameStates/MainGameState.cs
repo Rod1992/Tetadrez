@@ -1,19 +1,49 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using UI;
 using UnityEngine;
 
 namespace GameStates
 {
     public class MainGameState : IGameState
     {
+        Action OnEndState;
+
+        public MainGameState(Action OnEndState)
+        {
+            OnEndState += OnEndState;
+        }
+
         public void OnPhaseEnded()
         {
-            throw new System.NotImplementedException();
+            TurnSystem.OnPassTurn -= OnPassTurn;
         }
 
         public void OnPhaseStarted()
         {
-            throw new System.NotImplementedException();
+            UI_ChessPiece.currentMode = EUIChessPieceMode.Grid;
+            TurnSystem.OnPassTurn += OnPassTurn;
+            UI_ChessPiece.HandlerDragging.EndDragging();
+
+            foreach(ChessPiece chessPiece in Container<ChessPiece>.GetItems())
+            {
+                chessPiece.ViewChessPiece.SetGridMode();
+            }
+
+            if (ServiceLocator.GetGameService<BoardState>(out BoardState board) && ServiceLocator.GetGameService<TurnSystem>(out TurnSystem turnSystem))
+            {
+                board.SetActiveCells(turnSystem.ActivePlayer);
+            }
+        }
+
+        private void OnPassTurn(int indexPlayer, Player player)
+        {
+            if(ServiceLocator.GetGameService<BoardState>(out BoardState boardState))
+            {
+                boardState.SetActiveCells(player);
+            }
+            
         }
     }
 }
