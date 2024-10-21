@@ -18,20 +18,20 @@ namespace UI
         {
             public static HandlerDraggingChessPiece currentHandler;
 
-            UI_ChessPiece piece;
+            ChessPiece piece;
 
-            private HandlerDraggingChessPiece(UI_ChessPiece chessPiece)
+            private HandlerDraggingChessPiece(ChessPiece chessPiece)
             {
                 piece = chessPiece;
             }
 
-            public static void StartDragging(UI_ChessPiece chessPiece)
+            public static void StartDragging(ChessPiece chessPiece)
             {
                 EndDragging();
                 currentHandler = new HandlerDraggingChessPiece(chessPiece);
             }
 
-            public static bool TryGetSelection(out UI_ChessPiece chessPiece)
+            public static bool TryGetSelection(out ChessPiece chessPiece)
             {
                 chessPiece = currentHandler?.piece;
                 return currentHandler != null && currentHandler.piece != null;
@@ -39,12 +39,13 @@ namespace UI
 
             public static void EndDragging()
             {
-                currentHandler?.piece.EndDragging();
+                currentHandler?.piece.ViewChessPiece.EndDragging();
                 currentHandler = null;
             }
         }
 
         public static EUIChessPieceMode currentMode = EUIChessPieceMode.None;
+        public Action OnStartDragging;
 
         bool isDragging = false;
         bool isActive = false;
@@ -87,7 +88,7 @@ namespace UI
         {
             isDragging = true;
             Debug.Log("Selected");
-            HandlerDraggingChessPiece.StartDragging(this);
+            OnStartDragging?.Invoke();
             button.raycastTarget = false;
             draggingCoroutine = StartCoroutine(OnDrag());
         }

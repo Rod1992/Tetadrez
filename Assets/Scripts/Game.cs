@@ -52,9 +52,9 @@ public class Game
                 currentState = new DeploymentState(NextPhase, configPieces);
                 break;
             case EGamePhase.MainGame:
-                break;
+                return;
             case EGamePhase.GameOver:
-                break;
+                return;
         }
 
         currentState.OnPhaseStarted();
@@ -67,7 +67,7 @@ public class Game
 
     public void OnGameOver(Player player)
     {
-        Debug.Log("Game Over");
+        Debug.LogError("Game Over");
         ForcePhase(EGamePhase.GameOver);
     }
 }

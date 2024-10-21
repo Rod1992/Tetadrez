@@ -60,6 +60,13 @@ public class ChessPieceScriptable : ScriptableObject
         IChessPieceMovement movement = GetMovement();
 
         ChessPiece chessPiece = new ChessPiece(ui_Chess, movement, player);
+
+        ui_Chess.OnStartDragging += () => StartDragging(chessPiece);
         return chessPiece;
+    }
+
+    void StartDragging(ChessPiece chessPiece)
+    {
+        UI_ChessPiece.HandlerDraggingChessPiece.StartDragging(chessPiece);
     }
 }

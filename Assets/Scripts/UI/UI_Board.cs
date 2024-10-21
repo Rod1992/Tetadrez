@@ -63,7 +63,7 @@ namespace UI
                         cells[i, j] = cell;
                     }
 
-                    cells[i, j].SetSize(widthCell, heightCell, new Vector2(centerX, centerY));
+                    cells[i, j].SetSize(widthCell, heightCell, new Vector2(centerX, centerY), new Vector2Int(i, j));
                     centerY += heightCell;
                 }
                 centerX += widthCell;

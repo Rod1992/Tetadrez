@@ -26,6 +26,17 @@ public class Cell
         get; private set;
     }
 
+    public UI_Cell UI_Cell
+    {
+        get => ui_Cell;
+    }
+
+    public Player Player
+    {
+        get;
+        set;
+    }
+
     public static void SetLeftRight(Cell left, Cell right)
     {
         if (left == null || right == null)
@@ -48,6 +59,7 @@ public class Cell
     {
         this.Pos = pos;
         this.ui_Cell = ui_Cell;
+        ui_Cell.SetOwner += SetOwner;
     }
 
     /// <summary>
@@ -56,33 +68,31 @@ public class Cell
     /// <param name="movement"></param>
     /// <param name="cell"></param>
     /// <returns>true if cell found</returns>
-    public bool TryGetCellFromMovement(Vector2Int movement, out Cell cell)
+    public bool TryGetCellFromMovement(Vector2Int movement, ref Cell cell)
     {
         Vector2Int consumedmovement = Vector2Int.zero;
-        cell = null;
 
         if (movement.x != 0)
         {
-            consumedmovement = new Vector2Int(movement.x > 0 ? movement.x - 1 : movement.x + 1, movement.y);
             cell = movement.x > 0 ? Right : Left;
-            
+            consumedmovement = new Vector2Int(movement.x > 0 ? movement.x - 1 : movement.x + 1, movement.y);
         } else if(movement.y != 0)
         {
-            consumedmovement = new Vector2Int(movement.x, movement.y > 0 ? movement.y - 1 : movement.y + 1);
             cell = movement.y > 0 ? Up : Down;
+            consumedmovement = new Vector2Int(movement.x, movement.y > 0 ? movement.y - 1 : movement.y + 1);
         }
 
-        if (consumedmovement == Vector2Int.zero)
-        {
-            cell = this;
-            return true;
-        }
-        else if(cell == null)
+        if (cell == null)
         {
             return false;
-        } else {
+        }
+        else if (consumedmovement == Vector2Int.zero)
+        {
+            return true;
+        }
+        else{
             
-            return TryGetCellFromMovement(consumedmovement, out cell);
+            return cell.TryGetCellFromMovement(consumedmovement, ref cell);
         }
     }
 
@@ -90,16 +100,21 @@ public class Cell
     {
         List<Cell> cells = new List<Cell>();
 
-        Cell cell;
+        Cell cell = null;
         for(int i = 0; i < movements.Length; i++)
         {
             Vector2Int movement = movements[i];
-            if(TryGetCellFromMovement(movement, out cell))
+            if(TryGetCellFromMovement(movement, ref cell))
             {
                 cells.Add(cell);
             }
         }
 
         return cells;
+    }
+
+    public void SetOwner(Vector2Int pos, Player player)
+    {
+        Player = player;
     }
 }
